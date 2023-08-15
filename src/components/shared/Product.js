@@ -1,10 +1,13 @@
-import React from 'react';
+import React,{useContext} from 'react';
 import { Link } from 'react-router-dom';
 //functions
-import { shorten } from '../../helper/functions';
+import { shorten, isIncCart, quantityCount } from '../../helper/functions';
+//context
+import { CartContext } from '../../context/CartContextProvider';
 
 const Product = ({productData}) => {
     const {image, title, price, id} = productData;
+    const {state, dispatch} = useContext(CartContext);
     return (
         <div>
            <img src = {image} alt = "product"/> 
@@ -13,7 +16,13 @@ const Product = ({productData}) => {
            <div>
                <Link to = {`/products/${id}`}>Details</Link>
                <div>
-               <button>Add to Cart</button>
+               {
+               isIncCart(state, id) ? 
+               <button onClick = {() => dispatch({type: "INCREASE", payload: productData})}>+</button>:
+               <button onClick = {() => dispatch({type: "ADD_ITEM", payload: productData})}>Add to Cart</button>
+               }
+               {quantityCount(state, id) ===1 && <button onClick = {() => dispatch({type:"REMOVE_ITEM", payload: productData})}>Remove</button>}
+               {quantityCount(state, id) > 1 && <button onClick = {() => dispatch({type:"DECREASE", payload: productData})}>-</button>}
                </div>
            </div>
         </div>
