@@ -6,25 +6,28 @@ import { shorten, isIncCart, quantityCount } from '../../helper/functions';
 import { CartContext } from '../../context/CartContextProvider';
 //icons
 import trashIcon from '../../assets/icons/trash.svg';
+//css
+import styles from '../shared/Product.module.css';
 
 const Product = ({productData}) => {
     const {image, title, price, id} = productData;
     const {state, dispatch} = useContext(CartContext);
     return (
-        <div>
-           <img src = {image} alt = "product"/> 
+        <div className = {styles.container}>
+           <img className = {styles.cardImage} src = {image} alt = "product"/> 
            <h3>{shorten(title)}</h3>
-           <p>{price}</p>
-           <div>
+           <p>{`${price} $`}</p>
+           <div className = {styles.linkContainer}>
                <Link to = {`/products/${id}`}>Details</Link>
-               <div>
+               <div className = {styles.buttonContainer}>
+               {quantityCount(state, id) ===1 && <button className = {styles.smallButton} onClick = {() => dispatch({type:"REMOVE_ITEM", payload: productData})}><img src = {trashIcon} alt = "trash"/></button>}
+               {quantityCount(state, id) > 1 && <button className = {styles.smallButton} onClick = {() => dispatch({type:"DECREASE", payload: productData})}>-</button>}
+
                {
                isIncCart(state, id) ? 
-               <button onClick = {() => dispatch({type: "INCREASE", payload: productData})}>+</button>:
+               <button className = {styles.smallButton} onClick = {() => dispatch({type: "INCREASE", payload: productData})}>+</button>:
                <button onClick = {() => dispatch({type: "ADD_ITEM", payload: productData})}>Add to Cart</button>
                }
-               {quantityCount(state, id) ===1 && <button onClick = {() => dispatch({type:"REMOVE_ITEM", payload: productData})}><img src = {trashIcon} alt = "trash"/></button>}
-               {quantityCount(state, id) > 1 && <button onClick = {() => dispatch({type:"DECREASE", payload: productData})}>-</button>}
                </div>
            </div>
         </div>
